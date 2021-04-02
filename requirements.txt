@@ -6,4 +6,5 @@ python-bidi==0.4.2
 PyArabic
 torch==1.8.0
 fuzzysearch==0.7.3
+htbuilder
 git+https://github.com/dantru7/Google-Search-API
