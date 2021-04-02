@@ -1,11 +1,9 @@
+import logging
 import re
 from functools import reduce
 from urllib.parse import unquote
 
 import streamlit as st
-from transformers.utils.dummy_pt_objects import (
-    MODEL_FOR_TABLE_QUESTION_ANSWERING_MAPPING,
-)
 import wikipedia
 from fuzzysearch import find_near_matches
 from googleapi import google
@@ -14,14 +12,21 @@ from transformers import AutoTokenizer, pipeline
 from annotator import annotated_text
 from preprocess import ArabertPreprocessor
 
+logger = logging.getLogger(__name__)
+
 wikipedia.set_lang("ar")
+
 preprocessor = ArabertPreprocessor("wissamantoun/araelectra-base-artydiqa")
 tokenizer = AutoTokenizer.from_pretrained("wissamantoun/araelectra-base-artydiqa")
 qa_pipe = pipeline("question-answering", model="wissamantoun/araelectra-base-artydiqa")
 
 
 def get_results(question):
-    search_results = google.search(question + " site:ar.wikipedia.org")
+    search_results = google.search(
+        question + " site:ar.wikipedia.org", lang="ar", area="ar"
+    )
+    if len(search_results) == 0:
+        return {}
     page_name = search_results[0].link.split("wiki/")[-1]
     wiki_page = wikipedia.page(unquote(page_name))
     wiki_page_content = wiki_page.content
@@ -39,10 +44,10 @@ def get_results(question):
                         preprocessor.preprocess(subsection)
                     )
                     subsections.append(subsection)
-                    print(f"Subsection found with length: {len(prep_subsection)}")
+                    logger.info(f"Subsection found with length: {len(prep_subsection)}")
                 sections.extend(subsections)
             else:
-                print(f"Regular Section with length: {len(prep_section)}")
+                logger.info(f"Regular Section with length: {len(prep_section)}")
                 sections.append(section)
 
     full_len_sections = []
@@ -57,17 +62,22 @@ def get_results(question):
                 temp_section = section
                 continue
             full_len_sections.append(temp_section)
-            print(
+            logger.info(
                 f"full section length: {len(tokenizer.tokenize(preprocessor.preprocess(temp_section)))}"
             )
             temp_section = ""
         else:
             temp_section += " " + section + " "
+    if temp_section != "":
+        full_len_sections.append(temp_section)
 
     results = qa_pipe(
         question=[preprocessor.preprocess(question)] * len(full_len_sections),
         context=[preprocessor.preprocess(x) for x in full_len_sections],
     )
+
+    if not isinstance(results, list):
+        results = [results]
 
     for result, section in zip(results, full_len_sections):
         result["original"] = section
@@ -87,8 +97,10 @@ def get_results(question):
     sorted_results = sorted(results, reverse=True, key=lambda x: x["score"])
 
     return_dict = {}
-    return_dict["title"] = page_name
+    return_dict["title"] = unquote(page_name)
     return_dict["results"] = sorted_results[0 : min(3, len(sorted_results))]
+
+    logger.info(str(return_dict))
 
     return return_dict
 
