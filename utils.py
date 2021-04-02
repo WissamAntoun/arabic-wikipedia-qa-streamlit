@@ -106,9 +106,12 @@ def get_results(question):
 
 
 def shorten_text(text, n, reverse=False):
+    if text.isspace() or text == '':
+        return text
     if reverse:
         text = text[::-1]
     words = iter(text.split())
+    print(text)
     lines, current = [], next(words)
     for word in words:
         if len(current) + 1 + len(word) > n:
@@ -133,3 +136,9 @@ def annotate_answer(result):
         (result["new_answer"], "جواب", "#8ef"),
         shorten_text(result["original"][result["new_end"] :], 500) + " ...... إلخ",
     )
+
+if __name__ == '__main__':
+    results_dict = get_results("ما هو نظام لبنان؟")
+    for result in results_dict["results"]:
+            annotate_answer(result)
+            f"[**المصدر**](<{result['link']}>)"
