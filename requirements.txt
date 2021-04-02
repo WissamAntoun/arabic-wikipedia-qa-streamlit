@@ -4,4 +4,5 @@ wikipedia==1.4.0
 st-annotated-text==1.0.1
 arabic-reshaper==2.1.3
 python-bidi==0.4.2
+PyArabic
 git+https://github.com/dantru7/Google-Search-API
