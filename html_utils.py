@@ -1,20 +1,11 @@
+import os
+import re
+
 import streamlit as st
-from htbuilder import (
-    HtmlElement,
-    div,
-    ul,
-    li,
-    br,
-    hr,
-    a,
-    p,
-    img,
-    styles,
-    classes,
-    fonts,
-)
+from htbuilder import (HtmlElement, a, br, classes, div, fonts, hr, img, li, p,
+                       styles, ul)
+from htbuilder.funcs import rgb, rgba
 from htbuilder.units import percent, px
-from htbuilder.funcs import rgba, rgb
 
 
 def image(src_as_string, **style):
@@ -83,3 +74,25 @@ def footer():
         # ),
     ]
     layout(*myargs)
+
+
+def gs():
+    code = """
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQH8C3F39G"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-VQH8C3F39G');
+    </script>
+    """
+
+    a = os.path.dirname(st.__file__) + "/static/index.html"
+    with open(a, "r") as f:
+        data = f.read()
+        if len(re.findall("G-", data)) == 0:
+            with open(a, "w") as ff:
+                newdata = re.sub("<head>", "<head>" + code, data)
+                ff.write(newdata)

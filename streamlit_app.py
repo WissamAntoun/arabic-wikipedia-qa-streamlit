@@ -4,9 +4,11 @@ import arabic_reshaper
 import streamlit as st
 from bidi.algorithm import get_display
 
-# from html_utils import footer
+from html_utils import ga
 
 from utils import annotate_answer, get_results, shorten_text
+
+ga()
 
 st.set_page_config(
     page_title="Arabic QA app",
@@ -15,6 +17,8 @@ st.set_page_config(
     # layout="wide"
 )
 # footer()
+
+
 
 
 rtl = lambda w: get_display(f"{arabic_reshaper.reshape(w)}")
