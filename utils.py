@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 
 wikipedia.set_lang("ar")
 
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 preprocessor = ArabertPreprocessor("wissamantoun/araelectra-base-artydiqa")
 tokenizer = AutoTokenizer.from_pretrained("wissamantoun/araelectra-base-artydiqa")
 qa_pipe = pipeline("question-answering", model="wissamantoun/araelectra-base-artydiqa")
