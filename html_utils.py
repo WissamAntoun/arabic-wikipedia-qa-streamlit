@@ -76,7 +76,7 @@ def footer():
     layout(*myargs)
 
 
-def gs():
+def ga():
     code = """
     <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQH8C3F39G"></script>
