@@ -1,5 +1,5 @@
 <p align="center">
-<img src="C:\repos\arabic-wikipedia-qa-streamlit\is2alni_logo.png" width="150"/>
+<img src="https://raw.githubusercontent.com/WissamAntoun/arabic-wikipedia-qa-streamlit/main/is2alni_logo.png" width="150"/>
 <p>
 
 <p align="center" style="font-size:40px">
