@@ -87,12 +87,19 @@ def get_results(question):
             max_l_dist=min(5, len(preprocessor.unpreprocess(result["answer"])) // 2),
             max_deletions=0,
         )
-        result["new_start"] = answer_match[0].start
-        result["new_end"] = answer_match[0].end
-        result["new_answer"] = answer_match[0].matched
-        result["link"] = (
-            search_results[0].link + "#:~:text=" + result["new_answer"].strip()
-        )
+        try:
+            result["new_start"] = answer_match[0].start
+            result["new_end"] = answer_match[0].end
+            result["new_answer"] = answer_match[0].matched
+            result["link"] = (
+                search_results[0].link + "#:~:text=" + result["new_answer"].strip()
+            )
+        except:
+            result["new_start"] = result["start"]
+            result["new_end"] = result["end"]
+            result["new_answer"] = result["answer"]
+            result["original"] = preprocessor.preprocess(result["original"])
+            result["link"] = search_results[0].link
 
     sorted_results = sorted(results, reverse=True, key=lambda x: x["score"])
 
@@ -106,7 +113,7 @@ def get_results(question):
 
 
 def shorten_text(text, n, reverse=False):
-    if text.isspace() or text == '':
+    if text.isspace() or text == "":
         return text
     if reverse:
         text = text[::-1]
@@ -137,8 +144,9 @@ def annotate_answer(result):
         shorten_text(result["original"][result["new_end"] :], 500) + " ...... إلخ",
     )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     results_dict = get_results("ما هو نظام لبنان؟")
     for result in results_dict["results"]:
-            annotate_answer(result)
-            f"[**المصدر**](<{result['link']}>)"
+        annotate_answer(result)
+        f"[**المصدر**](<{result['link']}>)"
