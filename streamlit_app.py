@@ -4,17 +4,27 @@ import arabic_reshaper
 import streamlit as st
 from bidi.algorithm import get_display
 
-from html_utils import footer
+# from html_utils import footer
+
 from utils import annotate_answer, get_results, shorten_text
 
 st.set_page_config(
     page_title="Arabic QA app",
     page_icon="📖",
-    initial_sidebar_state='collapsed'
+    initial_sidebar_state="collapsed"
     # layout="wide"
 )
 # footer()
 
+
+rtl = lambda w: get_display(f"{arabic_reshaper.reshape(w)}")
+
+
+_, col1, _ = st.beta_columns(3)
+
+with col1:
+    st.image("is2alni_logo.png",width=200)
+    st.title("إسألني أي شيء")
 
 st.markdown(
     """
@@ -27,19 +37,14 @@ p, div, input, label {
     unsafe_allow_html=True,
 )
 
-
-rtl = lambda w: get_display(f"{arabic_reshaper.reshape(w)}")
-
-st.title("إسألني أي شيء")
-
 st.sidebar.header("Info")
 
 st.sidebar.write("Made by [Wissam Antoun](https://twitter.com/wissam_antoun)")
 st.sidebar.write("Powered by [AraELECTRA](https://github.com/aub-mind/arabert)")
 
 question = st.text_input("", value="ما هو نظام لبنان؟")
-if '؟' not in question:
-    question += '؟'
+if "؟" not in question:
+    question += "؟"
 
 run_query = st.button("أجب")
 if run_query:
