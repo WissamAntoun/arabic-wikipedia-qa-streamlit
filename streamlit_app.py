@@ -47,7 +47,7 @@ st.sidebar.write("Made by [Wissam Antoun](https://twitter.com/wissam_antoun)")
 st.sidebar.write("Powered by [AraELECTRA](https://github.com/aub-mind/arabert)")
 st.sidebar.write("Source Code [GitHub](https://github.com/WissamAntoun/arabic-wikipedia-qa-streamlit)")
 st.sidebar.write("\n")
-n_answers = st.sidebar.slider("Max. number of answers",min_value=1,max_value=10,value=3,step=1)
+n_answers = st.sidebar.slider("Max. number of answers",min_value=1,max_value=10,value=1,step=1)
 
 question = st.text_input("", value="من هو جو بايدن ؟")
 if "؟" not in question:
