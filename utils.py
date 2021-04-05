@@ -1,7 +1,7 @@
 import logging
 import re
 import os
-from functools import reduce
+from functools import lru_cache
 from urllib.parse import unquote
 
 import streamlit as st
@@ -20,10 +20,12 @@ wikipedia.set_lang("ar")
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 preprocessor = ArabertPreprocessor("wissamantoun/araelectra-base-artydiqa")
+logger.info("Loading Pipeline...")
 tokenizer = AutoTokenizer.from_pretrained("wissamantoun/araelectra-base-artydiqa")
 qa_pipe = pipeline("question-answering", model="wissamantoun/araelectra-base-artydiqa")
+logger.info("Finished loading Pipeline...")
 
-
+@lru_cache(maxsize=100)
 def get_results(question):
     search_results = google.search(
         question + " site:ar.wikipedia.org", lang="ar", area="ar"
