@@ -220,9 +220,6 @@ class ArabertPreprocessor:
             str: The unpreprocessed (and possibly Farasa-desegmented) text.
         """
 
-        if self.model_name in SEGMENTED_MODELS and desegment:
-            text = self.desegment(text)
-
         # removes the spaces around quotation marks ex: i " ate " an apple --> i "ate" an apple
         # https://stackoverflow.com/a/53436792/5381220
         text = re.sub(white_spaced_double_quotation_regex, '"' + r"\1" + '"', text)
