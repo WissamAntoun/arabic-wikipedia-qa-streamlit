@@ -122,7 +122,7 @@ def get_results(question):
 
     return_dict = {}
     return_dict["title"] = unquote(page_name)
-    return_dict["results"] = sorted_results[0 : min(3, len(sorted_results))]
+    return_dict["results"] = sorted_results
 
 
     reader_time.stop()
