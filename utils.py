@@ -26,20 +26,43 @@ tokenizer = AutoTokenizer.from_pretrained("wissamantoun/araelectra-base-artydiqa
 qa_pipe = pipeline("question-answering", model="wissamantoun/araelectra-base-artydiqa")
 logger.info("Finished loading Pipeline...")
 
+
 @lru_cache(maxsize=100)
 def get_results(question):
+    logger.info("\n=================================================================")
     logger.info(f"Question: {question}")
-    search_timer = Timer("search and wiki", text="Search and Wikipedia Time: {:.2f}", logger=logging.info)
-    search_timer.start()
-    search_results = google.search(
-        question + " site:ar.wikipedia.org", lang="ar", area="ar"
+
+    if "وسام أنطون" in question or "wissam antoun" in question.lower():
+        return {
+            "title": "Creator",
+            "results": [
+                {
+                    "score": 1.0,
+                    "new_start": 0,
+                    "new_end": 12,
+                    "new_answer": "My Creator 😜",
+                    "original": "My Creator 😜",
+                    "link": "https://github.com/WissamAntoun/",
+                }
+            ],
+        }
+    search_timer = Timer(
+        "search and wiki", text="Search and Wikipedia Time: {:.2f}", logger=logging.info
     )
-    if len(search_results) == 0:
+    try:
+        search_timer.start()
+        search_results = google.search(
+            question + " site:ar.wikipedia.org", lang="ar", area="ar"
+        )
+        if len(search_results) == 0:
+            return {}
+
+        page_name = search_results[0].link.split("wiki/")[-1]
+        wiki_page = wikipedia.page(unquote(page_name))
+        wiki_page_content = wiki_page.content
+        search_timer.stop()
+    except:
         return {}
-    page_name = search_results[0].link.split("wiki/")[-1]
-    wiki_page = wikipedia.page(unquote(page_name))
-    wiki_page_content = wiki_page.content
-    search_timer.stop()
 
     sections = []
     for section in re.split("== .+ ==[^=]", wiki_page_content):
@@ -116,14 +139,13 @@ def get_results(question):
             result["new_answer"] = result["answer"]
             result["original"] = preprocessor.preprocess(result["original"])
             result["link"] = search_results[0].link
-        logger.info(f"Answers: {result['new_answer']}")
+        logger.info(f"Answers: {preprocessor.preprocess(result['new_answer'])}")
 
     sorted_results = sorted(results, reverse=True, key=lambda x: x["score"])
 
     return_dict = {}
     return_dict["title"] = unquote(page_name)
     return_dict["results"] = sorted_results
-
 
     reader_time.stop()
     logger.info(f"Total time spent: {reader_time.last + search_timer.last}")
